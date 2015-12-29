@@ -1,5 +1,9 @@
 #!/usr/bin/python3
-
+''' This script allows the user to specify a search query and Reddit subforum to
+    submit to Reddit. It receives the relevant comments returned from the
+    Reddit website, normalizes them, and performs an inverse document frequency
+    analysis of the terms within to identify related keywords.
+'''
 
 import argparse    # Command line argument parsing
 import praw        # Python Reddit API Wrapper
