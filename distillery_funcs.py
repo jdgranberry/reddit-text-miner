@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-
-import sys
-import praw        # Python Reddit API Wrapper
+''' A collection of helper functions for Reddit Information Distillery. '''
 from collections import Counter # Allows combining dicts while adding values
 import math        # math.log()
 import string      # string.maketrans(), string.punctuation
