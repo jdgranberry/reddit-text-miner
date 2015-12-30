@@ -13,5 +13,5 @@ is a time-consuming process.
 
 Reddit contains an enormous amount of searchable user-submitted information
 on a multitude of subjects, and this program is an attempt to automate my
-own "forum-assisted" learning process, with the goal of identifying common
-themes after performing a Reddit search query.
+"forum-assisted" learning process, with the goal of identifying common themes 
+after performing a Reddit search query.
