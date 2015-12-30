@@ -67,12 +67,7 @@ for submission in r.search(query, target_subreddit, sort=None, Period=None):
             comment_count += 1
             unique_words_in_comment = set(
                 distillery_funcs.normalize_string(comment.body, stopwords, query))
-            #print(unique_words_in_comment)
             for word in unique_words_in_comment:
-                #debug
-                #if word in stopwords:
-                #    print("Exiting")
-                #    sys.exit()
                 comment_word_frequency[word] += 1
 
             # Update comment counter display
