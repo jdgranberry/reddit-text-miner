@@ -12,8 +12,14 @@ import time        # Timing computation
 import distillery_funcs # helper functions
 import sys         # sys.stdout, sys.exit()
 
+# To get rid of the "unclosed socket" ResourceWarning, you must uncomment the
+#following two lines of code. Unfortunately this disables ALL warnings.
+#import warnings
+#warnings.filterwarnings('ignore')
+
 DEFAULT_SEARCH = 'PRAW'
 DEFAULT_SUB = 'cscareerquestions'
+NUM_RESULTS = 10
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Reddit Topic Analyzer',
     epilog='Author: Josh Granberry (jdgranberry@gmail.com)')
@@ -27,13 +33,13 @@ args = parser.parse_args()
 query = args.query
 target_subreddit = args.subreddit
 
-print('\nRunning analyzer for query \"' + query + '\" on subforum \"' +
+print('\nDistilling results for query \"' + query + '\" on subreddit \"' +
     target_subreddit + '"...')
 # Login information file
 user_info = open('user_info.txt')
 
 # Connect to Reddit and identify script
-r = praw.Reddit(user_agent='Python3 Reddit Topic Analyzer v0.1.0'
+r = praw.Reddit(user_agent='Python3 Reddit Information Distillery v0.1.0'
     'Created by /u/jdgranberry'
     'Designed to refine search results into a collection of '
     'significant keywords and topics.')
@@ -46,16 +52,20 @@ r.login(username, password, disable_warning=True)
 # Reddit target forum for search
 subreddit = r.get_subreddit(target_subreddit)
 
-# Generate submissions from a search
-comment_count = 0
-comment_word_frequency = Counter()
-
 # Get list of stopwords and add query to it
 stopwords = distillery_funcs.load_stopwords()
-stopwords += query.lower().split()
 
 # Start timer
 time_start = time.time()
+
+# Generate results from a search
+print('\nQUERY: ' + query)
+print('SUBREDDIT: ' + target_subreddit)
+comment_count = 0
+word_count = 0
+comment_word_freq = Counter()
+collection_word_freq = Counter()
+TFIDF_values = Counter()
 
 for submission in r.search(query, target_subreddit, sort=None, Period=None):
     # Flatten comment trees into a single unordered list.
@@ -65,30 +75,42 @@ for submission in r.search(query, target_subreddit, sort=None, Period=None):
         # Verify comment is a Comment (rather than MoreComments) object
         if isinstance(comment, praw.objects.Comment):
             comment_count += 1
-            unique_words_in_comment = set(
-                distillery_funcs.normalize_string(comment.body, stopwords, query))
+            comment = distillery_funcs.normalize_string(comment.body, stopwords,
+                query)
+            for word in comment:
+                word_count += 1
+                collection_word_freq[word] += 1
+            unique_words_in_comment = set(comment)
             for word in unique_words_in_comment:
-                comment_word_frequency[word] += 1
+                comment_word_freq[word] += 1
 
             # Update comment counter display
-            sys.stdout.write("\rComments processed: " + str(comment_count))
+            sys.stdout.write("\rCOMMENTS PROCESSED: " + str(comment_count))
             sys.stdout.flush()
 
 
-
+# Calculate inverse document frequencylen
 inverse_doc_freq = distillery_funcs.inverse_document_frequency(
-    comment_word_frequency, comment_count)
+    comment_word_freq, comment_count)
 
+# Calculate collection term frequency
+for key, value in collection_word_freq.items():
+    collection_word_freq[key] = value / word_count
+
+# Calculate the TF-IDF
+if (len(collection_word_freq) == len(inverse_doc_freq)):
+    for key in inverse_doc_freq:
+        TFIDF_values[key] = collection_word_freq[key] * inverse_doc_freq[key]
+else:
+    print("TF and IDF do not contain the same number of keys.")
+    sys.exit()
 
 
 # End timer
 time_end = time.time()
 
 # Print results
-print('\nQUERY: ' + query)
-print('SUBFORUM: ' + target_subreddit)
-print("\nIDF CONTENTS: ")
-for k, v in inverse_doc_freq.most_common(10):
-    print(k + " : " + str(v))
-print("Words in IDF: " + str(len(inverse_doc_freq)))
-print("Runtime:     " + str(round(time_end - time_start, 2)))
+print("\n\nTOP " + str(NUM_RESULTS) + ": ")
+for k, v in TFIDF_values.most_common(NUM_RESULTS):
+    print(k + ": " + str(round(v * 100, 2)))
+print("\nRuntime:     " + str(round(time_end - time_start, 2)) + "s")

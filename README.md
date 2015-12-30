@@ -1,4 +1,4 @@
-    When trying to answer a specific question I have, or find out more about a
+When trying to answer a specific question I have, or find out more about a
 particular subject, I like to use internet forums and their capability to
 search posts within specific subforums to get an overview of my subject. I
 find this user-submitted information to be an easily-digestible, relatable
