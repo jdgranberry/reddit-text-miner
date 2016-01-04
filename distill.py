@@ -33,8 +33,6 @@ args = parser.parse_args()
 query = args.query
 target_subreddit = args.subreddit
 
-print('\nDistilling results for query \"' + query + '\" on subreddit \"' +
-    target_subreddit + '"...')
 # Login information file
 user_info = open('user_info.txt')
 
@@ -94,8 +92,8 @@ inverse_doc_freq = distillery_funcs.inverse_document_frequency(
     comment_word_freq, comment_count)
 
 # Calculate collection term frequency
-for key, value in collection_word_freq.items():
-    collection_word_freq[key] = value / word_count
+collection_word_freq = distillery_funcs.term_frequency(
+    collection_word_freq, word_count)
 
 # Calculate the TF-IDF
 if (len(collection_word_freq) == len(inverse_doc_freq)):
@@ -113,4 +111,4 @@ time_end = time.time()
 print("\n\nTOP " + str(NUM_RESULTS) + ": ")
 for k, v in TFIDF_values.most_common(NUM_RESULTS):
     print(k + ": " + str(round(v * 100, 2)))
-print("\nRuntime:     " + str(round(time_end - time_start, 2)) + "s")
+print("\nRUNTIME:     " + str(round(time_end - time_start, 2)) + "s")

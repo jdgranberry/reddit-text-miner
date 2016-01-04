@@ -40,6 +40,26 @@ def normalize_string(comment, stopwords, query):
     words = list(filter(None, words))
     return words
 
+def term_frequency(termlist, word_count):
+    ''' Calculate the term frequency of words within the collection of comments.
+        Input is a Counter dict of keys (terms) and values (number of
+        appearances) and the word count for the collection.
+
+        Computes the term frequency as follows:
+        Number of appearances of word within the collection /
+        Word count for the collection.
+
+        Returns another Counter with each word and its TF value.
+    '''
+    cnt = Counter()
+    if (word_count != 0):
+        for key, value in termlist.items():
+            cnt[key] = value / word_count
+    else:
+        print("TF attempted to divide by 0.\n")
+    return cnt
+
+
 
 def inverse_document_frequency(termlist, total_comments):
     ''' Input is a Counter dictionary of frequency of unique appearances within
@@ -49,12 +69,14 @@ def inverse_document_frequency(termlist, total_comments):
 
         Compute the inverse term frequency as follows:
         Ln(Total number of documents /
-              Number of documents containing term t) '''
+              Number of documents containing term t)
+
+        Returns another Counter with each word and its TF value.
+    '''
     cnt = Counter()
     if (total_comments != 0):
         for key, value in termlist.items():
             cnt[key] = math.log(total_comments / value)
-        return cnt
     else: #divide by 0
         print("IDF attempted to divide by 0.\n")
-        return cnt
+    return cnt
