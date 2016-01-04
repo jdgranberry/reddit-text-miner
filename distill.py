@@ -19,7 +19,7 @@ import sys         # sys.stdout, sys.exit()
 
 DEFAULT_SEARCH = 'PRAW'
 DEFAULT_SUB = 'cscareerquestions'
-NUM_RESULTS = 10
+NUM_RESULTS = 20
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Reddit Topic Analyzer',
     epilog='Author: Josh Granberry (jdgranberry@gmail.com)')
@@ -51,7 +51,8 @@ r.login(username, password, disable_warning=True)
 subreddit = r.get_subreddit(target_subreddit)
 
 # Get list of stopwords and add query to it
-stopwords = distillery_funcs.load_stopwords()
+stopwords = distillery_funcs.load_stopwords(query)
+
 
 # Start timer
 time_start = time.time()
@@ -65,7 +66,9 @@ comment_word_freq = Counter()
 collection_word_freq = Counter()
 TFIDF_values = Counter()
 
-for submission in r.search(query, target_subreddit, sort=None, Period=None):
+comment_corpus = r.search(query, target_subreddit, sort=None, Period=None)
+
+for submission in comment_corpus:
     # Flatten comment trees into a single unordered list.
     flat_comments = praw.helpers.flatten_tree(submission.comments)
     for comment in flat_comments:
@@ -73,8 +76,8 @@ for submission in r.search(query, target_subreddit, sort=None, Period=None):
         # Verify comment is a Comment (rather than MoreComments) object
         if isinstance(comment, praw.objects.Comment):
             comment_count += 1
-            comment = distillery_funcs.normalize_string(comment.body, stopwords,
-                query)
+            comment = distillery_funcs.normalize_string(
+                comment.body, stopwords)
             for word in comment:
                 word_count += 1
                 collection_word_freq[word] += 1

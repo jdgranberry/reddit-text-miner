@@ -7,11 +7,11 @@ import re          # regular expressions
 
 STOPWORDS_FILE = "stopwords.txt"
 
-def load_stopwords():
+def load_stopwords(query):
     ''' Get list of stopwords from text file where each word is delimited by a
         new line.
 
-        Returns a list of stopwords. '''
+        Returns a list of stopwords, including the supplied query string. '''
     try:
         stopfile = open(STOPWORDS_FILE, mode='r')
     except IOError:
@@ -22,17 +22,18 @@ def load_stopwords():
             stopwords.append(line.rstrip('\n'))
         stopfile.close()
 
+    for word in query.lower().split():
+        stopwords.append(word)
+
     return stopwords
 
-def normalize_string(comment, stopwords, query):
+def normalize_string(comment, stopwords):
     ''' Normalize the text as such:
             Remove common words and query ("is," "the, "etc.")
             Convert words to lowercase.
             Remove punctuation.
 
         Returns a list of individual words in comment.'''
-    stopwords += query.lower().split()
-
     comment = comment.lower().split()
     words = [w.strip(string.punctuation) for w in comment if w not in stopwords]
 
