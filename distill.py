@@ -20,8 +20,10 @@ import sys         # sys.stdout, sys.exit()
 DEFAULT_SEARCH = 'PRAW'
 DEFAULT_SUB = 'cscareerquestions'
 NUM_RESULTS = 20
+
 # Parse command line arguments
-parser = argparse.ArgumentParser(description='Reddit Topic Analyzer',
+parser = argparse.ArgumentParser(
+    description='Reddit Topic Analyzer',
     epilog='Author: Josh Granberry (jdgranberry@gmail.com)')
 
 #-s SUBFORUM -q QUERY
@@ -33,7 +35,7 @@ args = parser.parse_args()
 query = args.query
 target_subreddit = args.subreddit
 
-# Login information file
+# Login information file containing two lines for username and password
 user_info = open('user_info.txt')
 
 # Connect to Reddit and identify script
